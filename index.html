@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gastos · Jorge & Alexandra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f4f1; --surface:#fcfcfb; --surface-2:#efeeea; --border:#e2e1dc;
+  --text:#0b0b0b; --text-2:#52514e; --muted:#7a7974;
+  --accent:#1f3a5f; --accent-ink:#ffffff;
+  --jorge:#2a78d6; --alexandra:#eb6834; --ambos:#1baf7a; --otro:#4a3aa7;
+  --bar:#2a78d6; --track:#ecebe6;
+  --good:#0f7b3f; --warn:#b26b00; --bad:#c23a3a;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#111110; --surface:#1a1a19; --surface-2:#232321; --border:#2f2f2c;
+    --text:#ffffff; --text-2:#c3c2b7; --muted:#8e8d86;
+    --accent:#7fb0ff; --accent-ink:#0b0b0b;
+    --jorge:#3987e5; --alexandra:#d95926; --ambos:#199e70; --otro:#9085e9;
+    --bar:#3987e5; --track:#2a2a28;
+    --good:#4cc38a; --warn:#e0a33a; --bad:#ef6b6b; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#111110; --surface:#1a1a19; --surface-2:#232321; --border:#2f2f2c;
+  --text:#ffffff; --text-2:#c3c2b7; --muted:#8e8d86;
+  --accent:#7fb0ff; --accent-ink:#0b0b0b;
+  --jorge:#3987e5; --alexandra:#d95926; --ambos:#199e70; --otro:#9085e9;
+  --bar:#3987e5; --track:#2a2a28;
+  --good:#4cc38a; --warn:#e0a33a; --bad:#ef6b6b; --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px 48px}
+header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.top{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{font-weight:700;font-size:16px;letter-spacing:-.01em;margin-right:auto}
+.brand small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+nav{display:flex;gap:4px;background:var(--surface-2);padding:3px;border-radius:10px}
+nav a{padding:7px 12px;border-radius:8px;color:var(--text-2);text-decoration:none;font-weight:500;white-space:nowrap}
+nav a.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.icon-btn{border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px}
+
+.banner{margin:16px 0;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.banner h1{margin:0;font-size:20px;letter-spacing:-.02em}
+.banner .sub{color:var(--text-2);font-size:13px;margin-top:2px}
+.pay{text-align:right}
+.pay .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.pay .d{font-weight:700;font-size:16px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--text-2)}
+.chip.warn{color:var(--warn)} .chip.bad{color:var(--bad)} .chip.good{color:var(--good)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+select,input,button{font:inherit;color:var(--text)}
+select,input[type=text],input[type=number],input[type=date],input[type=search]{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:9px 10px;min-height:40px;width:100%}
+.controls select,.controls input{width:auto}
+.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:600;cursor:pointer;background:var(--accent);color:var(--accent-ink);min-height:40px}
+.btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn:disabled{opacity:.6;cursor:wait}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.kpi .k{font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:6px}
+.kpi .v{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.card h2{font-size:14px;margin:0 0 2px;letter-spacing:-.01em}
+.card .hint{font-size:12px;color:var(--muted);margin:0 0 12px}
+.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+@media (max-width:900px){.c4,.c5,.c6,.c7,.c8{grid-column:span 12}}
+
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar-row{display:grid;grid-template-columns:minmax(90px,38%) 1fr auto;gap:10px;align-items:center;padding:2px 0;cursor:default}
+.bar-row .nm{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;gap:6px;align-items:center}
+.bar-row .tr{height:14px;background:var(--track);border-radius:4px;overflow:hidden}
+.bar-row .fl{height:100%;border-radius:0 4px 4px 0;background:var(--bar);min-width:2px}
+.bar-row .vl{font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--text);text-align:right;min-width:92px}
+.bar-row .vl span{color:var(--muted);margin-left:4px}
+.bar-row:hover .tr{outline:2px solid var(--border)}
+.empty{color:var(--muted);font-size:13px;padding:12px 0}
+
+form .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+form .row.one{grid-template-columns:1fr}
+@media (max-width:560px){form .row{grid-template-columns:1fr}}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text-2);font-weight:500}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--text-2);margin:2px 0 12px}
+.check input{width:18px;height:18px}
+.who{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:11.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0;background:var(--surface)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl{max-height:520px;overflow:auto}
+.tag{font-size:11.5px;padding:2px 7px;border-radius:999px;background:var(--surface-2);color:var(--text-2);white-space:nowrap;display:inline-flex;gap:5px;align-items:center}
+.del{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0 4px}
+.del:hover{color:var(--bad)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.filters select,.filters input{width:auto;flex:1 1 140px}
+
+#tip{position:fixed;pointer-events:none;z-index:50;background:var(--text);color:var(--bg);padding:7px 10px;border-radius:8px;font-size:12px;line-height:1.35;opacity:0;transition:opacity .08s;max-width:260px}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;opacity:0;transition:.2s;z-index:60}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.loading{padding:60px 0;text-align:center;color:var(--muted)}
+.foot{margin-top:18px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+@media (max-width:560px){.banner{grid-template-columns:1fr}.pay{text-align:left}.bar-row{grid-template-columns:minmax(80px,34%) 1fr auto}}
+</style>
+</head>
+<body>
+<header><div class="top">
+  <div class="brand">💳 Gastos de la casa<small>Jorge & Alexandra</small></div>
+  <nav id="nav"></nav>
+  <button class="icon-btn" id="theme" title="Cambiar tema">◐</button>
+</div></header>
+
+<div class="wrap">
+  <div class="banner">
+    <div><h1 id="title">Panel general</h1><div class="sub" id="periodo">Cargando…</div></div>
+    <div class="pay"><div class="lbl">Fecha límite de pago</div><div class="d" id="pago">—</div><div id="pagoChip"></div></div>
+  </div>
+  <div class="controls">
+    <select id="selCorte" aria-label="Corte"></select>
+    <button class="btn ghost" id="btnRefresh">↻ Actualizar</button>
+    <span style="flex:1"></span>
+    <button class="btn ghost" id="btnCorte" title="Crea el siguiente corte y traslada las cuotas pendientes">＋ Iniciar nuevo corte</button>
+  </div>
+  <main id="app"><div class="loading">Cargando datos de Google Sheets…</div></main>
+  <div class="foot"><span>Los datos se guardan en Google Sheets (hoja “Gastos”). · <a href="#" id="salir" style="color:inherit">Cambiar clave</a></span><span id="stamp"></span></div>
+</div>
+<div id="tip"></div><div id="toast"></div>
+
+<script>
+/* ═════ CONFIGURACIÓN: pega aquí la URL de tu Apps Script (termina en /exec) ═════ */
+var API_URL = 'PEGA_AQUI_LA_URL_DE_APPS_SCRIPT';
+
+var PAGE = (new URLSearchParams(location.search).get('p') || 'panel').toLowerCase();
+var BASE = location.pathname;
+
+var PERSONAS = { jorge: 'Jorge', alexandra: 'Alexandra' };
+var COLOR = { Jorge: 'var(--jorge)', Alexandra: 'var(--alexandra)', Ambos: 'var(--ambos)' };
+function colorDe(n) { return COLOR[n] || 'var(--otro)'; }
+
+var S = { data: null, corte: null, _intentos: 0 };
+
+/* ───── Utilidades ───── */
+var $ = function (s) { return document.querySelector(s); };
+var fmtL = function (n) { return 'L ' + Number(n || 0).toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+var fmtK = function (n) { return n >= 10000 ? 'L ' + (n / 1000).toLocaleString('es-HN', { maximumFractionDigits: 1 }) + 'k' : fmtL(n); };
+var MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+function fDate(s, y) { if (!s) return ''; var p = s.split('-'); return +p[2] + ' ' + MES[+p[1] - 1] + (y === false ? '' : ' ' + p[0]); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function hoyStr() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function diasEntre(a, b) { return Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 864e5); }
+function sum(a) { return a.reduce(function (s, g) { return s + g.monto; }, 0); }
+function agrupar(list, key) {
+  var m = {};
+  list.forEach(function (g) { var k = typeof key === 'function' ? key(g) : g[key]; (m[k] = m[k] || { k: k, v: 0, n: 0 }); m[k].v += g.monto; m[k].n++; });
+  return Object.keys(m).map(function (k) { return m[k]; }).sort(function (a, b) { return b.v - a.v; });
+}
+function toast(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('on'); }, 2600); }
+function getClave() { try { return localStorage.getItem('gastos_clave') || ''; } catch (e) { return S._clave || ''; } }
+function setClave(v) { S._clave = v; try { v ? localStorage.setItem('gastos_clave', v) : localStorage.removeItem('gastos_clave'); } catch (e) {} }
+function api(fn, arg) {
+  var body = { action: fn, clave: getClave() };
+  if (fn === 'registrarGasto') body.gasto = arg;
+  if (fn === 'eliminarGasto') body.id = arg;
+  var req = fn === 'getDatos'
+    ? fetch(API_URL + '?action=getDatos&clave=' + encodeURIComponent(body.clave) + '&t=' + Date.now())
+    : fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+  return req.then(function (r) { return r.json(); }).then(function (j) {
+    if (!j.ok) { var e = new Error(j.error || 'Error'); if (/clave/i.test(j.error || '')) e.clave = true; throw e; }
+    return j.data;
+  });
+}
+function pedirClave(msg) {
+  $('#app').innerHTML = '<section class="card" style="max-width:420px;margin:30px auto"><h2>🔒 Ingresa la clave</h2><p class="hint">' + (msg || 'Solo se pide una vez en este dispositivo.') + '</p>' +
+    '<form id="frmClave"><input type="password" id="inClave" inputmode="numeric" placeholder="Clave" required style="margin-bottom:10px"><button class="btn" style="width:100%">Entrar</button></form></section>';
+  $('#frmClave').onsubmit = function (e) { e.preventDefault(); setClave($('#inClave').value.trim()); $('#app').innerHTML = '<div class="loading">Cargando…</div>'; cargar(); };
+}
+/* ───── Tema ───── */
+(function () {
+  try { var t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  $('#theme').onclick = function () {
+    var dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var n = dark ? 'light' : 'dark'; document.documentElement.dataset.theme = n;
+    try { localStorage.setItem('theme', n); } catch (e) {}
+  };
+})();
+
+/* ───── Navegación ───── */
+(function () {
+  var items = [['panel', '📊 Panel'], ['jorge', 'Jorge'], ['alexandra', 'Alexandra']];
+  $('#nav').innerHTML = items.map(function (i) {
+    return '<a href="' + BASE + '?p=' + i[0] + '" class="' + (PAGE === i[0] ? 'on' : '') + '">' + i[1] + '</a>';
+  }).join('');
+})();
+
+/* ───── Tooltip ───── */
+var tip = $('#tip');
+document.addEventListener('mousemove', function (e) {
+  var el = e.target.closest && e.target.closest('[data-tip]');
+  if (!el) { tip.style.opacity = 0; return; }
+  tip.innerHTML = el.getAttribute('data-tip');
+  var x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8), y = e.clientY + 14;
+  if (y + tip.offsetHeight > innerHeight - 8) y = e.clientY - tip.offsetHeight - 10;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px'; tip.style.opacity = 1;
+});
+
+/* ───── Componentes ───── */
+function barras(grupos, opts) {
+  opts = opts || {};
+  if (!grupos.length) return '<div class="empty">Sin gastos en este corte.</div>';
+  var total = grupos.reduce(function (s, g) { return s + g.v; }, 0), max = grupos[0].v || 1;
+  var lim = opts.limit || 99, list = grupos.slice(0, lim);
+  if (grupos.length > lim) {
+    var resto = grupos.slice(lim);
+    list.push({ k: 'Otros (' + resto.length + ')', v: resto.reduce(function (s, g) { return s + g.v; }, 0), n: resto.reduce(function (s, g) { return s + g.n; }, 0), otros: true });
+  }
+  return '<div class="bars" role="table">' + list.map(function (g) {
+    var pct = total ? g.v / total * 100 : 0, col = opts.color ? opts.color(g.k) : 'var(--bar)';
+    var lab = opts.label ? opts.label(g.k) : esc(g.k);
+    var t = '<b>' + esc(g.k) + '</b><br>' + fmtL(g.v) + ' · ' + pct.toFixed(1) + '%<br>' + g.n + ' gasto' + (g.n === 1 ? '' : 's');
+    return '<div class="bar-row" role="row" data-tip="' + esc(t) + '">' +
+      '<div class="nm" role="cell">' + lab + '</div>' +
+      '<div class="tr"><div class="fl" style="width:' + Math.max(g.v / max * 100, .5) + '%;background:' + (g.otros ? 'var(--muted)' : col) + '"></div></div>' +
+      '<div class="vl" role="cell">' + fmtK(g.v) + '<span>' + Math.round(pct) + '%</span></div></div>';
+  }).join('') + '</div>';
+}
+function kpi(k, v, s, color) {
+  return '<div class="kpi"><div class="k">' + (color ? '<span class="dot" style="background:' + color + '"></span>' : '') + k + '</div><div class="v">' + v + '</div>' + (s ? '<div class="s">' + s + '</div>' : '') + '</div>';
+}
+function tagResp(r) { return '<span class="tag"><span class="dot" style="background:' + colorDe(r) + '"></span>' + esc(r) + '</span>'; }
+function card(cls, titulo, hint, body) { return '<section class="card ' + cls + '"><h2>' + titulo + '</h2>' + (hint ? '<p class="hint">' + hint + '</p>' : '<div style="height:10px"></div>') + body + '</section>'; }
+
+function tablaGastos(list, conFiltros) {
+  var id = 'tg' + Math.random().toString(36).slice(2, 7);
+  var d = S.data, f = '';
+  if (conFiltros) {
+    var opt = function (arr, todos) { return '<option value="">' + todos + '</option>' + arr.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join(''); };
+    var resp = Array.from(new Set(list.map(function (g) { return g.responsable; })));
+    var cats = Array.from(new Set(list.map(function (g) { return g.categoria; }))).sort();
+    f = '<div class="filters" data-for="' + id + '">' +
+      '<input type="search" placeholder="Buscar descripción…" data-f="q">' +
+      '<select data-f="responsable">' + opt(resp, 'Todos los responsables') + '</select>' +
+      '<select data-f="tarjeta">' + opt(d.tarjetas.map(function (t) { return t.tarjeta; }), 'Todas las tarjetas') + '</select>' +
+      '<select data-f="categoria">' + opt(cats, 'Todas las categorías') + '</select></div>';
+  }
+  setTimeout(function () { pintarTabla(id, list); }, 0);
+  if (conFiltros) setTimeout(function () {
+    var box = document.querySelector('[data-for="' + id + '"]');
+    box.addEventListener('input', function () {
+      var v = {}; box.querySelectorAll('[data-f]').forEach(function (e) { v[e.dataset.f] = e.value; });
+      pintarTabla(id, list.filter(function (g) {
+        return (!v.responsable || g.responsable === v.responsable) && (!v.tarjeta || g.tarjeta === v.tarjeta) &&
+          (!v.categoria || g.categoria === v.categoria) && (!v.q || g.descripcion.toLowerCase().indexOf(v.q.toLowerCase()) >= 0);
+      }));
+    });
+  }, 0);
+  return f + '<div class="tbl" id="' + id + '"></div>';
+}
+function pintarTabla(id, list) {
+  var el = document.getElementById(id); if (!el) return;
+  if (!list.length) { el.innerHTML = '<div class="empty">No hay gastos que coincidan.</div>'; return; }
+  var rows = list.slice().sort(function (a, b) { return a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0; });
+  el.innerHTML = '<table><thead><tr><th>Fecha</th><th>Descripción</th><th>Categoría</th><th>Tarjeta</th><th>Responsable</th><th class="n">Monto</th><th></th></tr></thead><tbody>' +
+    rows.map(function (g) {
+      return '<tr><td style="white-space:nowrap">' + fDate(g.fecha, false) + '</td><td>' + esc(g.descripcion) +
+        (g.cuotas || /cuota/i.test(g.observacion || '') ? '<br><span class="tag">🔁 ' + esc(g.observacion || ('Faltan ' + g.cuotas + ' cuotas')) + '</span>' : '') +
+        '</td><td>' + esc(g.categoria) + '</td><td>' + esc(g.tarjeta) + '</td><td>' + tagResp(g.responsable) +
+        '</td><td class="n">' + fmtL(g.monto) + '</td><td><button class="del" title="Eliminar" data-del="' + esc(g.id) + '">✕</button></td></tr>';
+    }).join('') + '</tbody><tfoot><tr><td colspan="5"><b>' + rows.length + ' gastos</b></td><td class="n"><b>' + fmtL(sum(rows)) + '</b></td><td></td></tr></tfoot></table>';
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-del]'); if (!b) return;
+  var g = S.data.gastos.find(function (x) { return x.id === b.dataset.del; });
+  if (!g || !confirm('¿Eliminar "' + g.descripcion + '" por ' + fmtL(g.monto) + '?')) return;
+  b.disabled = true;
+  api('eliminarGasto', g.id).then(function () { toast('Gasto eliminado'); cargar(); }).catch(function (err) { alert(err.message || err); b.disabled = false; });
+});
+
+/* ───── Cabecera del corte ───── */
+function corteActual() { return S.data.cortes.find(function (c) { return c.id === S.corte; }) || S.data.cortes[S.data.cortes.length - 1]; }
+function pintarCabecera() {
+  var c = corteActual();
+  $('#selCorte').innerHTML = S.data.cortes.slice().reverse().map(function (x) {
+    return '<option value="' + x.id + '"' + (x.id === c.id ? ' selected' : '') + '>Corte ' + fDate(x.inicio, false) + ' – ' + fDate(x.fin) + '</option>';
+  }).join('');
+  $('#periodo').textContent = 'Corte del ' + fDate(c.inicio) + ' al ' + fDate(c.fin);
+  $('#pago').textContent = fDate(c.pago);
+  var dias = diasEntre(S.data.hoy || hoyStr(), c.pago), chip;
+  if (dias < 0) chip = '<span class="chip">Fecha de pago pasada</span>';
+  else if (dias === 0) chip = '<span class="chip bad">⚠ Se paga hoy</span>';
+  else if (dias <= 7) chip = '<span class="chip warn">⏳ Faltan ' + dias + ' días</span>';
+  else chip = '<span class="chip good">Faltan ' + dias + ' días</span>';
+  $('#pagoChip').innerHTML = chip;
+  $('#stamp').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' });
+}
+
+/* ───── Página: Panel ───── */
+function paginaPanel() {
+  $('#title').textContent = 'Panel general';
+  var gs = S.data.gastos.filter(function (g) { return g.corte === corteActual().id; });
+  var tot = sum(gs), por = {};
+  agrupar(gs, 'responsable').forEach(function (r) { por[r.k] = r; });
+  var otros = gs.filter(function (g) { return ['Jorge', 'Alexandra', 'Ambos'].indexOf(g.responsable) < 0; });
+  var pctOf = function (v) { return tot ? Math.round(v / tot * 100) + '% del total' : ''; };
+  var titulares = agrupar(gs, 'titular');
+  var cuotas = gs.filter(function (g) { return g.cuotas > 0; });
+
+  var h = '<div class="kpis">' +
+    kpi('Total del corte', fmtL(tot), gs.length + ' gastos') +
+    kpi('Jorge', fmtL((por.Jorge || {}).v), pctOf((por.Jorge || {}).v || 0), 'var(--jorge)') +
+    kpi('Alexandra', fmtL((por.Alexandra || {}).v), pctOf((por.Alexandra || {}).v || 0), 'var(--alexandra)') +
+    kpi('Ambos (compartido)', fmtL((por.Ambos || {}).v), pctOf((por.Ambos || {}).v || 0), 'var(--ambos)') +
+    (otros.length ? kpi('Otros', fmtL(sum(otros)), Array.from(new Set(otros.map(function (g) { return g.responsable; }))).join(', '), 'var(--otro)') : '') +
+    '</div><div class="grid">';
+
+  h += card('c5', 'Gasto por responsable', 'Quién generó cada gasto', barras(agrupar(gs, 'responsable'), { color: colorDe, label: function (k) { return '<span class="dot" style="background:' + colorDe(k) + '"></span>' + esc(k); } }));
+  h += card('c7', '¿De qué tarjeta se gasta más?', 'Color = titular de la tarjeta · ' + titulares.map(function (t) { return esc(t.k) + ' ' + fmtK(t.v); }).join(' · '),
+    barras(agrupar(gs, 'tarjeta'), { color: function (k) { var t = S.data.tarjetas.find(function (x) { return x.tarjeta === k; }); return colorDe(t ? t.titular : ''); } }));
+  h += card('c7', '¿En qué gastamos más?', 'Por categoría, de mayor a menor', barras(agrupar(gs, 'categoria'), { limit: 12 }));
+  h += card('c5', 'Por titular de tarjeta', 'Cuánto debe pagar cada uno en sus tarjetas', barras(titulares, { color: colorDe, label: function (k) { return '<span class="dot" style="background:' + colorDe(k) + '"></span>' + esc(k); } }) +
+    '<div style="height:16px"></div><h2>Responsable × tarjeta</h2><div style="height:8px"></div>' + matriz(gs));
+  h += card('c12', 'Compras a cuotas activas', 'En cada nuevo corte se agregan solas con una cuota menos', tablaCuotas(cuotas));
+  h += card('c12', 'Detalle de gastos', 'Filtra por responsable, tarjeta o categoría', tablaGastos(gs, true));
+  $('#app').innerHTML = h + '</div>';
+}
+function matriz(gs) {
+  var resp = agrupar(gs, 'responsable').map(function (r) { return r.k; });
+  var tj = agrupar(gs, 'tarjeta').map(function (r) { return r.k; });
+  if (!tj.length) return '';
+  var v = function (r, t) { return sum(gs.filter(function (g) { return g.responsable === r && g.tarjeta === t; })); };
+  return '<div class="tbl"><table><thead><tr><th>Tarjeta</th>' + resp.map(function (r) { return '<th class="n">' + esc(r) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+    tj.map(function (t) { return '<tr><td>' + esc(t) + '</td>' + resp.map(function (r) { var x = v(r, t); return '<td class="n">' + (x ? fmtK(x) : '<span style="color:var(--muted)">—</span>') + '</td>'; }).join('') + '</tr>'; }).join('') +
+    '</tbody></table></div>';
+}
+function tablaCuotas(list) {
+  if (!list.length) return '<div class="empty">No hay compras a cuotas en este corte.</div>';
+  var pend = list.reduce(function (s, g) { return s + g.monto * g.cuotas; }, 0);
+  return '<div class="tbl"><table><thead><tr><th>Descripción</th><th>Tarjeta</th><th>Responsable</th><th class="n">Cuota</th><th class="n">Cuotas restantes</th><th class="n">Saldo pendiente*</th></tr></thead><tbody>' +
+    list.map(function (g) {
+      return '<tr><td>' + esc(g.descripcion) + '</td><td>' + esc(g.tarjeta) + '</td><td>' + tagResp(g.responsable) + '</td><td class="n">' + fmtL(g.monto) +
+        '</td><td class="n">' + g.cuotas + '</td><td class="n">' + fmtL(g.monto * g.cuotas) + '</td></tr>';
+    }).join('') + '</tbody><tfoot><tr><td colspan="5"><b>Total comprometido en cuotas futuras</b></td><td class="n"><b>' + fmtL(pend) + '</b></td></tr></tfoot></table></div>' +
+    '<p class="hint" style="margin:8px 0 0">*Cuota × cuotas restantes (aproximado, sin intereses).</p>';
+}
+
+/* ───── Página: Persona ───── */
+function paginaPersona(nombre) {
+  $('#title').innerHTML = '<span class="who"><span class="dot" style="background:' + colorDe(nombre) + ';width:12px;height:12px"></span>Gastos de ' + nombre + '</span>';
+  var c = corteActual(), d = S.data;
+  var gs = d.gastos.filter(function (g) { return g.corte === c.id; });
+  var mios = gs.filter(function (g) { return g.responsable === nombre; });
+  var amb = gs.filter(function (g) { return g.responsable === 'Ambos'; });
+  var enMisTarjetas = gs.filter(function (g) { return g.titular === nombre; });
+  var tarjOpts = d.tarjetas.slice().sort(function (a, b) { return (b.titular === nombre) - (a.titular === nombre); })
+    .map(function (t) { return '<option>' + esc(t.tarjeta) + '</option>'; }).join('');
+
+  var form = '<form id="frm" autocomplete="off">' +
+    '<div class="row"><label class="f">Fecha<input type="date" name="fecha" value="' + (d.hoy || hoyStr()) + '" required></label>' +
+    '<label class="f">Monto (L)<input type="number" name="monto" step="0.01" min="0.01" inputmode="decimal" placeholder="0.00" required></label></div>' +
+    '<div class="row one"><label class="f">Descripción<input type="text" name="descripcion" list="descs" placeholder="Ej. Maxi Despensa" required></label></div>' +
+    '<div class="row"><label class="f">Tarjeta<select name="tarjeta" required>' + tarjOpts + '</select></label>' +
+    '<label class="f">Categoría<input type="text" name="categoria" list="cats" placeholder="Ej. Supermercados" required></label></div>' +
+    '<div class="row"><label class="f">Cuotas restantes (opcional)<input type="number" name="cuotas" min="0" step="1" placeholder="0 si es de contado"></label>' +
+    '<label class="f">Responsable<input type="text" value="' + nombre + '" disabled id="respView"></label></div>' +
+    '<label class="check"><input type="checkbox" name="ambos" id="chkAmbos"> Es un gasto compartido (se guarda como “Ambos”)</label>' +
+    '<button class="btn" style="width:100%" id="btnGuardar">Guardar gasto</button>' +
+    '<datalist id="cats">' + d.categorias.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>' +
+    '<datalist id="descs">' + Array.from(new Set(d.gastos.map(function (g) { return g.descripcion; }))).map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>' +
+    '</form>';
+
+  var h = '<div class="kpis">' +
+    kpi('Mis gastos este corte', fmtL(sum(mios)), mios.length + ' gastos', colorDe(nombre)) +
+    kpi('Compartidos (Ambos)', fmtL(sum(amb)), 'Mitad: ' + fmtL(sum(amb) / 2), 'var(--ambos)') +
+    kpi('A pagar en mis tarjetas', fmtL(sum(enMisTarjetas)), 'Antes del ' + fDate(c.pago)) +
+    '</div><div class="grid">';
+  h += card('c5', 'Registrar gasto', 'Se guarda en Google Sheets con responsable ' + nombre, form);
+  h += card('c7', '¿En qué gasto más?', 'Mis gastos por categoría', barras(agrupar(mios, 'categoria'), { limit: 10, color: function () { return colorDe(nombre); } }));
+  h += card('c6', '¿Con qué tarjeta?', 'Mis gastos por tarjeta', barras(agrupar(mios, 'tarjeta'), { color: function () { return colorDe(nombre); } }));
+  h += card('c6', 'Mis tarjetas', 'Todo lo cargado a tarjetas de ' + nombre + ', por responsable', barras(agrupar(enMisTarjetas, 'responsable'), { color: colorDe, label: function (k) { return '<span class="dot" style="background:' + colorDe(k) + '"></span>' + esc(k); } }));
+  h += card('c12', 'Mis gastos del corte', '', tablaGastos(mios, false));
+  $('#app').innerHTML = h + '</div>';
+
+  $('#chkAmbos').onchange = function () { $('#respView').value = this.checked ? 'Ambos' : nombre; };
+  $('#frm').onsubmit = function (e) {
+    e.preventDefault();
+    var f = new FormData(this), b = $('#btnGuardar');
+    var g = { fecha: f.get('fecha'), monto: f.get('monto'), descripcion: f.get('descripcion'), tarjeta: f.get('tarjeta'),
+      categoria: f.get('categoria'), cuotas: f.get('cuotas'), responsable: f.get('ambos') ? 'Ambos' : nombre, registradoPor: nombre };
+    b.disabled = true; b.textContent = 'Guardando…';
+    api('registrarGasto', g).then(function (r) {
+      toast('✓ Guardado: ' + g.descripcion + ' · ' + fmtL(g.monto));
+      S.corte = r.corte; cargar();
+    }).catch(function (err) { alert('No se pudo guardar: ' + (err.message || err)); b.disabled = false; b.textContent = 'Guardar gasto'; });
+  };
+}
+
+/* ───── Carga ───── */
+function render() {
+  pintarCabecera();
+  if (PERSONAS[PAGE]) paginaPersona(PERSONAS[PAGE]); else paginaPanel();
+}
+function cargar() {
+  return api('getDatos').then(function (d) {
+    S.data = d;
+    if (!S.corte || !d.cortes.some(function (c) { return c.id === S.corte; })) {
+      var hoy = d.hoy || hoyStr();
+      var c = d.cortes.find(function (c) { return hoy >= c.inicio && hoy <= c.fin; }) || d.cortes[d.cortes.length - 1];
+      S.corte = c.id;
+    }
+    render();
+  }).catch(function (e) {
+    if (e.clave) { setClave(''); return pedirClave('Clave incorrecta, intenta de nuevo.'); }
+    $('#app').innerHTML = '<div class="loading">No se pudo conectar con Google Sheets.<br><small>' + esc(e.message || e) + '</small><br><small>Revisa que API_URL en index.html sea la URL /exec de tu Apps Script y que el acceso sea “Cualquier usuario”.</small></div>';
+  });
+}
+$('#selCorte').onchange = function () { S.corte = this.value; render(); };
+$('#btnRefresh').onclick = function () { if (!S.data) return; cargar().then(function () { toast('Datos actualizados'); }); };
+$('#btnCorte').onclick = function () {
+  if (!S.data) return;
+  var ult = S.data.cortes[S.data.cortes.length - 1], hoy = S.data.hoy || hoyStr();
+  var msg = 'Se creará el corte siguiente al ' + fDate(ult.fin) + ' y se copiarán las compras a cuotas con una cuota menos.';
+  if (hoy <= ult.fin) msg += '\n\nOjo: el corte actual todavía no termina (cierra el ' + fDate(ult.fin) + '). El sistema también lo crea solo cuando registras un gasto después de esa fecha.';
+  if (!confirm(msg + '\n\n¿Continuar?')) return;
+  var b = this; b.disabled = true;
+  api('nuevoCorte').then(function (r) { toast('Nuevo corte: ' + r.cuotas + ' cuotas trasladadas'); S.corte = r.corte; return cargar(); })
+    .catch(function (e) { alert(e.message || e); }).then(function () { b.disabled = false; });
+};
+if (API_URL.indexOf('http') !== 0) $('#app').innerHTML = '<div class="loading">Falta configurar <b>API_URL</b> en index.html (línea ~140) con la URL de tu Apps Script.</div>';
+else if (!getClave()) pedirClave();
+else cargar();
+$('#salir').onclick = function (e) { e.preventDefault(); setClave(''); pedirClave(); };
+</script>
+</body>
+</html>

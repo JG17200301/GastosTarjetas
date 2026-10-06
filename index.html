@@ -276,6 +276,7 @@ function pintarTabla(id, list) {
     rows.map(function (g) {
       return '<tr><td style="white-space:nowrap">' + fDate(g.fecha, false) + '</td><td>' + esc(g.descripcion) +
         (g.cuotas || /cuota/i.test(g.observacion || '') ? '<br><span class="tag">🔁 ' + esc(g.observacion || ('Faltan ' + g.cuotas + ' cuotas')) + '</span>' : '') +
+        (/fijo/i.test(g.observacion || '') ? '<br><span class="tag">📌 Fijo mensual</span>' : '') +
         '</td><td>' + esc(g.categoria) + '</td><td>' + esc(g.tarjeta) + '</td><td>' + tagResp(g.responsable) +
         '</td><td class="n">' + fmtL(g.monto) + '</td><td><button class="del" title="Eliminar" data-del="' + esc(g.id) + '">✕</button></td></tr>';
     }).join('') + '</tbody><tfoot><tr><td colspan="5"><b>' + rows.length + ' gastos</b></td><td class="n"><b>' + fmtL(sum(rows)) + '</b></td><td></td></tr></tfoot></table>';
@@ -331,6 +332,7 @@ function paginaPanel() {
   h += card('c7', '¿En qué gastamos más?', 'Por categoría, de mayor a menor', barras(agrupar(gs, 'categoria'), { limit: 12 }));
   h += card('c5', 'Por titular de tarjeta', 'Cuánto debe pagar cada uno en sus tarjetas', barras(titulares, { color: colorDe, label: function (k) { return '<span class="dot" style="background:' + colorDe(k) + '"></span>' + esc(k); } }) +
     '<div style="height:16px"></div><h2>Responsable × tarjeta</h2><div style="height:8px"></div>' + matriz(gs));
+  h += card('c12', 'Gastos fijos mensuales', 'Se agregan solos en cada corte nuevo · para cambiar un monto o dar de baja uno, edítalo en la hoja “Fijos” (Activo = No)', tablaFijos(S.data.fijos || []));
   h += card('c12', 'Compras a cuotas activas', 'En cada nuevo corte se agregan solas con una cuota menos', tablaCuotas(cuotas));
   h += card('c12', 'Detalle de gastos', 'Filtra por responsable, tarjeta o categoría', tablaGastos(gs, true));
   $('#app').innerHTML = h + '</div>';
@@ -343,6 +345,15 @@ function matriz(gs) {
   return '<div class="tbl"><table><thead><tr><th>Tarjeta</th>' + resp.map(function (r) { return '<th class="n">' + esc(r) + '</th>'; }).join('') + '</tr></thead><tbody>' +
     tj.map(function (t) { return '<tr><td>' + esc(t) + '</td>' + resp.map(function (r) { var x = v(r, t); return '<td class="n">' + (x ? fmtK(x) : '<span style="color:var(--muted)">—</span>') + '</td>'; }).join('') + '</tr>'; }).join('') +
     '</tbody></table></div>';
+}
+function tablaFijos(list) {
+  if (!list.length) return '<div class="empty">No hay gastos fijos configurados.</div>';
+  var act = list.filter(function (f) { return f.activo; });
+  return '<div class="tbl"><table><thead><tr><th>Descripción</th><th>Categoría</th><th>Tarjeta</th><th>Responsable</th><th>Estado</th><th class="n">Monto mensual</th></tr></thead><tbody>' +
+    list.map(function (f) {
+      return '<tr' + (f.activo ? '' : ' style="opacity:.5"') + '><td>' + esc(f.descripcion) + '</td><td>' + esc(f.categoria) + '</td><td>' + esc(f.tarjeta) + '</td><td>' + tagResp(f.responsable) +
+        '</td><td>' + (f.activo ? 'Activo' : 'Pausado') + '</td><td class="n">' + fmtL(f.monto) + '</td></tr>';
+    }).join('') + '</tbody><tfoot><tr><td colspan="5"><b>Total fijo por mes (' + act.length + ' activos)</b></td><td class="n"><b>' + fmtL(act.reduce(function (s, f) { return s + f.monto; }, 0)) + '</b></td></tr></tfoot></table></div>';
 }
 function tablaCuotas(list) {
   if (!list.length) return '<div class="empty">No hay compras a cuotas en este corte.</div>';
@@ -375,6 +386,7 @@ function paginaPersona(nombre) {
     '<div class="row"><label class="f">Cuotas restantes (opcional)<input type="number" name="cuotas" min="0" step="1" placeholder="0 si es de contado"></label>' +
     '<label class="f">Responsable<input type="text" value="' + nombre + '" disabled id="respView"></label></div>' +
     '<label class="check"><input type="checkbox" name="ambos" id="chkAmbos"> Es un gasto compartido (se guarda como “Ambos”)</label>' +
+    '<label class="check" style="margin-top:-6px"><input type="checkbox" name="fijo"> 📌 Es un gasto fijo mensual (se repetirá solo en cada corte)</label>' +
     '<button class="btn" style="width:100%" id="btnGuardar">Guardar gasto</button>' +
     '<datalist id="cats">' + d.categorias.map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>' +
     '<datalist id="descs">' + Array.from(new Set(d.gastos.map(function (g) { return g.descripcion; }))).map(function (x) { return '<option value="' + esc(x) + '">'; }).join('') + '</datalist>' +
@@ -397,7 +409,7 @@ function paginaPersona(nombre) {
     e.preventDefault();
     var f = new FormData(this), b = $('#btnGuardar');
     var g = { fecha: f.get('fecha'), monto: f.get('monto'), descripcion: f.get('descripcion'), tarjeta: f.get('tarjeta'),
-      categoria: f.get('categoria'), cuotas: f.get('cuotas'), responsable: f.get('ambos') ? 'Ambos' : nombre, registradoPor: nombre };
+      categoria: f.get('categoria'), cuotas: f.get('cuotas'), responsable: f.get('ambos') ? 'Ambos' : nombre, registradoPor: nombre, fijo: !!f.get('fijo') };
     b.disabled = true; b.textContent = 'Guardando…';
     api('registrarGasto', g).then(function (r) {
       toast('✓ Guardado: ' + g.descripcion + ' · ' + fmtL(g.monto));
@@ -430,11 +442,11 @@ $('#btnRefresh').onclick = function () { if (!S.data) return; cargar().then(func
 $('#btnCorte').onclick = function () {
   if (!S.data) return;
   var ult = S.data.cortes[S.data.cortes.length - 1], hoy = S.data.hoy || hoyStr();
-  var msg = 'Se creará el corte siguiente al ' + fDate(ult.fin) + ' y se copiarán las compras a cuotas con una cuota menos.';
+  var msg = 'Se creará el corte siguiente al ' + fDate(ult.fin) + ' ; se copiarán las compras a cuotas (con una cuota menos) y los gastos fijos mensuales.';
   if (hoy <= ult.fin) msg += '\n\nOjo: el corte actual todavía no termina (cierra el ' + fDate(ult.fin) + '). El sistema también lo crea solo cuando registras un gasto después de esa fecha.';
   if (!confirm(msg + '\n\n¿Continuar?')) return;
   var b = this; b.disabled = true;
-  api('nuevoCorte').then(function (r) { toast('Nuevo corte: ' + r.cuotas + ' cuotas trasladadas'); S.corte = r.corte; return cargar(); })
+  api('nuevoCorte').then(function (r) { toast('Nuevo corte: ' + r.cuotas + ' cuotas y ' + (r.fijos || 0) + ' gastos fijos agregados'); S.corte = r.corte; return cargar(); })
     .catch(function (e) { alert(e.message || e); }).then(function () { b.disabled = false; });
 };
 if (API_URL.indexOf('http') !== 0) $('#app').innerHTML = '<div class="loading">Falta configurar <b>API_URL</b> en index.html (línea ~140) con la URL de tu Apps Script.</div>';
